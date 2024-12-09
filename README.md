@@ -1,5 +1,6 @@
 # Real-Time-Data-Streaming
-# Real-Time-Data-Streaming
+
+### Visualisation de la météo en temps réel.
 
 Créer un dossier dans la racine de votre projet nommé “kafka”
 $ mkdir kafka
