@@ -7,8 +7,9 @@ import json
 import time 
 
 API_KEY = '73ed67eeb50ad642aaad2c693d6c4d44'  # Clé API
-CITIES = ['Paris', 'London', 'Tokyo']  # Villes cibles
+CITIES = ['Paris', 'London', 'Tokyo', 'Bangkok', 'Berlin']  # Villes cibles
 
+KAFKA_TOPIC = 'topic-weather'
 
 # Configuration
 KAFKA_SERVER = 'localhost:9092'
@@ -21,7 +22,7 @@ producer = KafkaProducer(
 
 for city in CITIES : 
   # Envoi des données en continu
-  producer.send("tp-meteo",  value=city)
+  producer.send("topic-weather",  value=city)
 
   import requests
 
@@ -39,7 +40,7 @@ while True:
     for city in CITIES:
         weather_data = get_weather_data(city)
         if weather_data:
-            producer.send('tp-meteo2', value= weather_data)
+            producer.send(KAFKA_TOPIC, key=city.encode('utf-8'), value=weather_data)
             # Affichage du message de confirmation
             print(f"Les données météo pour {city} ont été envoyées avec succès.")
         else:
