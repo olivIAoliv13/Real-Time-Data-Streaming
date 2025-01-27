@@ -2,61 +2,51 @@
 
 ### Visualisation de la météo en temps réel.
 
-Créer un dossier dans la racine de votre projet nommé “kafka”
-$ mkdir kafka
+### Etapes de lancement
 
-Créer un autre dossier dans la racine de votre projet nommé “spark”
-$ mkdir spark
+- Lancer Zoopkeeper
+./kafka_2.12-2.6.0/bin/zookeeper-server-start.sh ./kafka_2.12-2.6.0/config/zookeeper.properties
 
-Créer dans le dossier kafka un fichier appélé “producer.py”
-$ cd kafka
-$ touch producer.py
+- Lancer Kafka
+./kafka_2.12-2.6.0/bin/kafka-server-start.sh ./kafka_2.12-2.6.0/config/server.properties
 
-renommer le fichier procuder.py en consomer.py
-$ mv producer.py consomer.py
+- Lancer producer.py
+python3.10 producer.py
 
-Afficher le contenu de votre repertoire racine
-$ cd -
-$ ls
+- Lancer spark.py
+$SPARK_HOME/bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.2.3 spark.py
 
-Afficher le contenu de votre repertoire kafka
-$ cd kafka
-$ ls
 
-Placer vous à l’aide de “cp” dans votre repertoire kafka
-?
+#### En cas de pb
+- Verifier que les topics actuels (de base - topic-weather et final - topic-weather-final) sont ok
+Sinon : Les changer grace aux commandes (modifier le nom des topics dans le code aussi)
 
-Installer java
-$ sudo apt-get update
-$ sudo apt-get install openjdk-11-jdk-headless
+./kafka_2.12-2.6.0/bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1--partitions 1 --topic topic-weather
 
-Installer kafka
+./kafka_2.12-2.6.0/bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1--partitions 1 --topic topic-weather-final
+
+- Verifier que spark et Kafka sont bien télechargé
+Sinon : Retelecharger 
+
+Kafka : 
 $ wget https://archive.apache.org/dist/kafka/2.6.0/kafka_2.12-2.6.0.tgz
 $ tar -xzf kafka_2.12-2.6.0.tgz
 
-Démarrer un serveur zookeeper
-$ ./kafka_2.12-2.6.0/bin/zookeeper-server-start.sh ./kafka_2.12-2.6.0/config/zookeeper.properties
+Spark :
+$ wget https://archive.apache.org/dist/spark/spark-3.2.3/spark-3.2.3-bin-hadoop2.7.tgz
+$ tar -xvf spark-3.2.3-bin-hadoop2.7.tgz
+config SPark :
+$ export SPARK_HOME=/workspaces/<votre-repertoire>/spark-3.2.3-bin-hadoop2.7
+$ export PATH=$SPARK_HOME/bin:$PATH
 
-Démarrer un server kafka
-$  ./kafka_2.12-2.6.0/bin/kafka-server-start.sh ./kafka_2.12-2.6.0/config/server.properties
+- Verifier que Python est bien en version 3.10
+$ python --version
 
-Créer un topic nommé “exo1”
-$ ./kafka_2.12-2.6.0/bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic exo1
+Sinon :
+$ sudo add-apt-repository ppa:deadsnakes/ppa
+$ sudo apt update
+$ sudo apt install -y python3.10 python3.10-venv python3.10-distutils
 
-Créer un autre topic nommé “exo2”
-$ ./kafka_2.12-2.6.0/bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic exo2
+## Résultats :
 
-Afficher la liste de tous les topics disponibles
-$ ./kafka_2.12-2.6.0/bin/kafka-topics.sh --list --bootstrap-server localhost:9092
-
-Supprimer le topic “exo2”
-$ ./kafka_2.12-2.6.0/bin/kafka-topics.sh --delete --bootstrap-server localhost:9092 --topic exo2
-
-Produire des messages dans le topic “exo1”
-$  ./kafka_2.12-2.6.0/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic exo1
-
-Consommer des messages stockés dans le topic “exo1”
-$  ./kafka_2.12-2.6.0/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic exo1 -- from-beginning
-
-Ouvrir l'environnement virtuel
-$ source kafka_env/bin/activate
+![image](https://github.com/user-attachments/assets/2c5f717a-aac4-4fc0-95c8-d2aa98dc2509)
